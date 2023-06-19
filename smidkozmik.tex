@@ -371,11 +371,11 @@ Let $P$ and $Q$ be probability distributions, both defined on $(\R^{p},\B^{p})$.
 is called \emph{transportattion} from $P$ into $Q$ if $P$ and
 $Q$ are its marginal distributions. i.e.
 \begin{equation}
-\pi[A\times\R^{p}]=PA\label{eq:tpp}
+\pi[A\times\R^{p}]=P(A)\label{eq:tpp}
 \end{equation}
 for each $A\in\B^{p}$ and 
 \begin{equation}
-\pi[\R^{p}\times B]=QB\label{eq:tpq}
+\pi[\R^{p}\times B]=Q(B)\label{eq:tpq}
 \end{equation}
 for each $B\in\B^{p}$. 
 \end{definition}
@@ -428,14 +428,14 @@ respectively.
 %\footnote{Recall that, due to the Markov property, the conditional probabilities depend only on the last observation of the process.} 
 Let
 \begin{equation}
-\ensuremath{\mathrm{d}(\mu_{t}(x),\nu_{t}(s))}\leq K_{t}\|x-s\|,\qquad x,s\in\R^{p},\qquad1\leq t\leq T,\label{eq:ktl}
+\ensuremath{\mathrm{d}(\mu_{t}(x),\mu_{t}(s))}\leq K_{t}\|x-s\|,\qquad x,s\in\R^{p},\qquad1\leq t\leq T,\label{eq:ktl}
 \end{equation}
 for some constants $K_{1},\dots,K_{T}\geq 0$. Then, for any $1\leq t\leq T$,
 \begin{multline}
 \d(\barxi_{t},\barvs_{t})\leq(1+K_{t})\d(\barxi_{t-1},\barvs_{t-1})+\E\mathrm{d}(\mu_{t}(\varsigma_{t-1}),\nu_{t}(\varsigma_{t-1}))\\
 \leq\sum_{\tau=1}^{t}\left(\prod_{i=\tau+1}^{t}(1+K_{i})\right)\E d(\mu_{\tau}(\varsigma_{\text{\ensuremath{\tau}}-1}),\nu_{\tau}(\varsigma_{\tau-1}))\label{eq:df}
 \end{multline}
-where, for any real sequence $x_1,\dots,x_{t}$, we put $\prod_{i=t+1}^{t} x_i = 1$.
+where $\prod_{i=t+1}^{t}(1+K_{i}) = 1$ by definition.
 \end{proposition}
 
 \begin{proof} See Appendix \ref{app:pp}
@@ -983,7 +983,7 @@ of the cut collections equals to $\kappa=\sum_{t=1}^{T}k_{t}=\sum_{t=1}^{T}\prod
 backward pass, only one collection per stage is updated. Therefore,
 it could be expected that the time complexity of the solution will
 be roughly linear in $\kappa$. Taking into account that a solution of a single problem by the plain
-SDDP takes tens of minutes on a regular PC (with processor Intel Core 5 and 16 GB RAM), it is clear that the numbers $k_{t,i}$ cannot be
+SDDP could take tens of minutes on a regular PC (with processor Intel Core 5 and 16 GB RAM), it is clear that the numbers $k_{t,i}$ cannot be
 high, especially given multi-dimensional $\xi_{t}$, and even
 in the one-dimensional it would be very time consuming to exploit the
 asymptotic properties we proved. In any case, the number of the atoms
