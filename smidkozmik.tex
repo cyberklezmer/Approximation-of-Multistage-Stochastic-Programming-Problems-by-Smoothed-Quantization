@@ -186,7 +186,7 @@
 \maketitle
 %\end{document}
 \begin{abstract}
-We present an approximation technique for solving multistage stochastic programming problems with Markov underlying stochastic process. The process is approximated by a discrete skeleton process, which is consequently smoothed down by means of the original unconditional distribution. Approximated this way, the problem is solvable by Markov Stochastic Dual Dynamic Programming. We state an upper bound of the nested distance of the exact process and its approximation and discuss its convergence in the one-dimensional case. Further, we propose an adjustment of the approximation guaranteeing boundedness of the approximate problem. Finally, we apply our technique to a real-life  production-emission trading problem and demonstrate the performance of its approximation given the ``true'' distribution of the random parameters.
+We present an approximation technique for solving multistage stochastic programming problems with an underlying Markov stochastic process. This process is approximated by a discrete skeleton process, which is consequently smoothed down by means of the original unconditional distribution. Approximated in this way, the problem is solvable by means of Markov Stochastic Dual Dynamic Programming. We state an upper bound for the nested distance between the exact process and its approximation and discuss its convergence in the one-dimensional case. We further propose an adjustment of the approximation, which guarantees that the approximate problem is bounded. Finally, we apply our technique to a real-life  production-emission trading problem and demonstrate the performance of its approximation given the ``true'' distribution of the random parameters.
 \end{abstract}
 
 \noindent Key words: multistage stochastic programming; approximation; Markov dependence; SDDP
@@ -195,61 +195,61 @@ We present an approximation technique for solving multistage stochastic programm
 
 \section{Introduction.}
 
-Stochastic programming evolved from its deterministic counterpart by realizing that the parameters influencing the objective function and constraints are usually uncertain, coming from the real world around us. Real world applications are ranging from economy to biology or logistics and engineering. The development in field led to multi-stage stochastic programming, which allows multiple stages of the decision and data process. Such models capture the dynamics of the underlying random process, and we are allowed to adjust our decisions based on the random parameters observed so far. Our decisions cannot depend on the parameters which are still uncertain and will be resolved in future stages, which means that the decisions fulfill the notion of nonanticipativity. Even though this generalization can be described in a straightforward manner, it brings substantial issues with theoretical properties, random process models and tractability. The applicability of such models often depends on the structure of the problem we are trying to solve. Multi-stage stochastic models have provided valuable improvements over the two-stage models in some particular cases, usually involving some complex time-dependent structure. Such examples can be found, for instance, in finance, energy management or transportation.
+Stochastic programming evolved from its deterministic counterpart by the realization that the parameters influencing the objective function and constraints are usually uncertain, coming from the real world around us. Real world applications range from economy to biology or logistics and engineering. Developments in this field led to multi-stage stochastic programming, which allows for resolving multiple stages of the decision-making and data processes. Such models capture the dynamics of the underlying random process, and we are able to adjust our decisions based on the random parameters observed so far. Our decisions cannot depend on the parameters which are still uncertain and will be resolved in future stages; in other words, the decisions fulfill the notion of nonanticipativity. Even though we can describe this generalization in a straightforward manner, it brings substantial issues with theoretical properties, random process models and tractability. The applicability of such models often depends on the structure of the problem we are trying to solve. Multi-stage stochastic models have provided us with valuable improvements over the two-stage models in certain particular cases, usually involving a complex time-dependent structure. Such examples can be found, for instance, in finance, energy management or transportation.
 
-There are two common ways to describe uncertainty in the stochastic programming models. The first approach is to collect some historical values or experts' opinion and produce a discrete distribution, which consists of scenarios with assigned probabilities. The second approach is to assume that the random inputs follow some continuous distribution and estimate its parameters from the data or use the experts' opinion to choose the parameters. When a continuous distribution is selected, sampling methods are commonly used to convert it to the discrete version in order to obtain a numerically tractable approximation, see for example \cite{pflug2014multistage}. For large-scale problems, we are unable to compute precise solutions even for this discrete approximation. 
+There are two usual ways to describe uncertainty in the stochastic programming models. The first approach is to collect some historical values or experts' opinions and produce a discrete distribution that consists of scenarios with assigned probabilities. The second approach is to assume that the random inputs follow a certain continuous distribution and estimate its parameters from the data or use the experts' opinions to choose those parameters. When a continuous distribution is selected, sampling methods are commonly used to convert it to the discrete version in order to obtain a numerically tractable approximation; see, for example, \cite{pflug2014multistage}. For large-scale problems, we are unable to compute precise solutions even for such discrete approximations. 
 
-Most of the stochastic programming models optimize the expected outcome of the random costs or returns. Resulting decisions are optimal on average, but possible risks are neglected. In many cases, this does not have to be an appropriate goal, as these decisions could produce a very unsatisfactory performance or even lead to bankruptcy under the worst-case scenarios. First developments in modeling risk aversion by using utility functions can be found in Bernoulli \cite{bernoulli}, or, more formal and precise description, in von Neumann and Morgenstern \cite{neumann}. Other significant ways to producing more robust solutions include mean-risk models. These bi-criteria models aim to find an efficient solution with respect to maximization of the mean return and minimization of the risk which is linked to the future uncertainty. Basics of the mean-risk concept using  variance and semivariance as a measure of risk were published in the article \cite{markowitz_artic} and  book \cite{markowitz_book}  by Harry Markowitz already in the 1950s. In recent years, risk-averse stochastic optimization based on various risk measures has received significant attention. The properties required of {\em coherent} risk measures, introduced in Artzner et al.\ \cite{artzner_99}, are now widely accepted for time-static risk-averse optimization. One of the most popular risk measures, Conditional Value at Risk (CVaR, see Rockafellar and Uryasev \cite{rockafellar2002conditional}), is known to satisfy these properties; for an overview of many others see, for instance, Krokhmal et al.\ \cite{K-U-Z}. A number of proposals have been put forward to extend the concept of coherent risk measures to handle multi-stage stochastic optimization.
+Most of the stochastic programming models optimize the expected outcome of the random costs or returns. The resulting decisions are optimal on average, but possible risks are neglected. In many cases, this goal need not necessarily be appropriate because such decisions could produce a very unsatisfactory performance or, under the worst-case scenarios, even lead to bankruptcy. First developments in modeling risk aversion by using utility functions can be found in Bernoulli \cite{bernoulli}, or a more formal and precise description in von Neumann and Morgenstern \cite{neumann}. Other significant ways to produce more robust solutions include mean-risk models. These bi-criterial models aim to find an efficient solution with respect to maximization of the mean return and minimization of the risk which is linked to the future uncertainty. Basics of the mean-risk concept using variance and semivariance as a measure of the risk were published in the article \cite{markowitz_artic} and  book \cite{markowitz_book}  by Harry Markowitz back in the 1950s. In recent years, risk-averse stochastic optimization based on various risk measures has been receiving significant attention. The properties required of {\em coherent} risk measures, introduced in Artzner et al.\ \cite{artzner_99}, are now widely accepted for time-static risk-averse optimization. One of the most popular risk measures, Conditional Value at Risk (CVaR, see Rockafellar and Uryasev \cite{rockafellar2002conditional}), is known to satisfy these properties; for an overview of many others see, for instance, Krokhmal et al.\ \cite{K-U-Z}. A number of proposals have been put forward to extend the concept of coherent risk measures to handle multi-stage stochastic optimization.
 
-Due to the complexity of stochastic programs,  discussed for example in Shapiro and Nemirovski \cite{complexity}, approximations are often employed. Monte Carlo sampling and scenario approximations have been used even before they got a name of \emph{Sample Average Approximation} in the article of Kleywegt et al. \cite{saa}. Approximate solutions depend on the particular set of sampled scenarios and are therefore random in general. Such approximate solutions require statistical validation, which is usually based on doing multiple replications and examining the stability of solutions and objective values, see Bayraksan and Morton \cite{bayraksan_morton_2011} for a summary of available methods. Scenario-based stochastic programs can often be reformulated as one large-scale standard optimization program, and such program can be solved directly by solvers like CPLEX, Gurobi or COIN-OR. The reformulated programs are usually very large and require long solving times or are unsolvable at all. This motivated the development of algorithms which exploit the special structure of stochastic programs and take advantage of particular properties like convexity. Optimization problems which include integer variables are known to be very hard to solve in general, and they are, of course, even more demanding in the stochastic setting. Most of the recent algorithms employ a technique of building so-called cuts on the feasible space or objective function. These cuts are used to eliminate infeasible or suboptimal decisions, or to approximate the objective function. The basic algorithm -- Benders' decomposition, sometimes called L-shaped method, was developed by Benders \cite{benders}, see also Van Slyke and Wets \cite{slyke_wets}. There have been many improvements of the basic algorithm, especially the multicut method by Birge and Louveaux \cite{birge_multicut}, regularized decomposition by Ruszczy{\'n}ski \cite{regular_decomp} and stochastic decomposition by Higle et al. \cite{stochdecomp_2stage}. These decomposition algorithms usually provide approximate solution and control its quality by computing lower and upper bounds on the true optimal objective value.
+Due to the complexity of stochastic programs,  discussed, for example, in Shapiro and Nemirovski \cite{complexity}, approximations are often employed. Monte Carlo sampling and scenario approximations had been used even before they were given the name of \emph{Sample Average Approximation} in the article by Kleywegt et al. \cite{saa}. Approximate solutions depend on the particular set of sampled scenarios and are therefore random in general. Such approximate solutions require statistical validation, which is usually based on performing multiple replications and examining the stability of solutions and objective values, see Bayraksan and Morton \cite{bayraksan_morton_2011} for a summary of available methods. Scenario-based stochastic programs can often be reformulated as one large-scale standard optimization program, and such a program can be directly solved by solvers like CPLEX, Gurobi or COIN-OR. The reformulated programs are usually very large and require long solving times or are not solvable at all. This aspect led to the development of algorithms which exploit the special structure of stochastic programs and take advantage of particular properties, such as convexity. Optimization problems containing integer variables are known to be very hard to solve in general, and they are, of course, even more demanding in the stochastic setting. Most of the recent algorithms employ a technique of building so-called cuts on the feasible space or objective function. These cuts are used to eliminate infeasible or suboptimal decisions, or to approximate the objective function. The basic algorithm -- Benders' decomposition, sometimes called the L-shaped method, was developed by Benders \cite{benders}, see also Van Slyke and Wets \cite{slyke_wets}. Many improvements of this basic algorithm have been proposed, especially the multicut method by Birge and Louveaux \cite{birge_multicut}, regularized decomposition by Ruszczy{\'n}ski \cite{regular_decomp}, and stochastic decomposition by Higle et al. \cite{stochdecomp_2stage}. These decomposition algorithms usually provide an approximate solution and control its quality by computing lower and upper bounds on the true optimal objective value.
 
-The structure of recourse functions in the multi-stage stochastic programs is particularly difficult from the algorithmic perspective. If we transform the multi-stage stochastic program into the dynamic programming recursion, the last stage program can be solved by the algorithms mentioned above. For the preceding stages, we need to realize that the precise form of the recourse function cannot be obtained, and we need to rely only on its approximation, provided by the cuts. Therefore we are recursively accumulating approximation error, which leads to slower convergence and requires further validation of correctness. The basic multi-stage decomposition algorithm, Nested Benders' decomposition  \cite{birge_85}, applied to a multi-stage stochastic program requires computational effort that grows exponentially  in the number of stages. Other important algorithms designed to solve multi-stage stochastic programs include extensions of stochastic decomposition to the multi-stage case \cite{stochdecomp,sen_zhou_2012}, progressive hedging \cite{rockafellar_wets_91} and stochastic dual dynamic programming (SDDP) \cite{pereirapinto}. SDDP will be used as the main solution technique for multi-stage stochastic programs in this article.
+The structure of recourse functions in the multi-stage stochastic programs is particularly difficult from the algorithmic perspective. If we transform a multi-stage stochastic program into a dynamic programming recursion, the last-stage program can be solved by the algorithms mentioned above. For the preceding stages, we need to realize that the precise form of the recourse function cannot be obtained, and we need to rely on its approximation, provided by the cuts. Therefore we are recursively accumulating approximation error, which leads to slower convergence and requires further validation of correctness. The basic multi-stage decomposition algorithm, Nested Benders' decomposition  \cite{birge_85}, applied to a multi-stage stochastic program, requires computational effort that grows exponentially  in the number of stages. Other important algorithms designed to solve multi-stage stochastic programs include extensions of stochastic decomposition to the multi-stage case \cite{stochdecomp,sen_zhou_2012}, progressive hedging \cite{rockafellar_wets_91}, and stochastic dual dynamic programming (SDDP) \cite{pereirapinto}. SDDP will be used as the main solution technique for multi-stage stochastic programs in this article.
 
-SDDP originated in the work of Pereira and Pinto \cite{pereirapinto}, and inspired a number of related algorithms \cite{chen_powell_99,donohue_birge_06,linowsky_philpott_05,philpott_guan_08}, which aim to improve its efficiency. SDDP-style algorithms have computational effort per iteration that grows linearly in the number of stages. To achieve this, SDDP algorithms rely on the assumption of stage-wise independence which is rarely
-the case in practice, especially in financial applications. Sometimes
-the requirement of time-independence can be circumvented by a suitable
-reformulation of the decision problem -- see e.g. \cite{kozmik2014evaluating}
+SDDP originated in the work of Pereira and Pinto \cite{pereirapinto}, and inspired a number of related algorithms \cite{chen_powell_99,donohue_birge_06,linowsky_philpott_05,philpott_guan_08}, which aim to improve its efficiency. SDDP-style algorithms have computational effort per iteration that grows linearly in the number of stages. To achieve this, SDDP algorithms rely on the assumption of stage-wise independence, which is rarely
+fulfilled in practice, especially in financial applications.
+The requirement of time-independence can sometimes be circumvented by a suitable
+reformulation of the decision problem -- see, e.g., \cite{kozmik2014evaluating}
 working with (independent) returns rather than (time-dependent) prices or \cite{lohndorf2019modeling} using artificial decision variables;
-however, in the majority of real-life applications, nothing like that
-could be done. A relatively recent modification of the SDDP
+however, in the majority of real-life applications, nothing similar
+is at our disposal. A relatively recent modification of the SDDP
 \cite{philpott2013solving}, which we call Markov SDDP, permits the
 underlying process to be conditioned by a finite Markov chain, which 
-allows to approximate a time-dependent underlying process by a hidden
+allows us to approximate a time-dependent underlying process by a hidden
 Markov model. However, as the Markov chain has to be sparse for computational
 reasons, the original process is approximated only
-roughly, which may result in serious errors. When CVaR is used as a risk measure, the discretized version may completely fail to approximate the original problem because the tails of the distribution are approximated at most by several atoms if not only with a single one, which causes CVaR to degenerate into the worst-case risk measure: instead of a risk averse problem, we would solve a minimax one. 
+roughly, which may result in serious errors. When CVaR is used as a risk measure, the discretized version may completely fail to approximate the original problem because the tails of the distribution are approximated at most by several atoms, or even a single one; this feature causes CVaR to degenerate into the worst-case risk measure: instead of a risk-averse problem, we would thus solve a minimax one. 
 
 
-In this paper, we overcome this problem by proposing a novel approximation technique which we call \emph{smoothed quantization}, consisting of two steps at each stage $t$. In the first step, the exact
+In this paper, we overcome the latter problem by proposing a novel approximation technique, which we call \emph{smoothed quantization}, consisting of two steps at each stage $t$. In the first step, the exact
 (conditional) $t$-th stage distribution is approximated by its quantization,
-i.e. an atomic distribution with the probabilities equal to the exact
+i.e., an atomic distribution with the probabilities equal to the exact
 (conditional) probabilities of pre-chosen regions surrounding its
 atoms (see \cite{lohndorf2019modeling}, \cite{kreitmeier2011optimal} or \cite{Pflug01}). In
 the second step, the quantization is smoothed down by means of the
-exact unconditional distribution, restricted to the regions. As a
-result, the shape of the approximation is resembling the one of the original distribution with the first-stage approximation being equal to the original distributuon. The approximating process remains dependent on the past only through a finite number of possible values, which allows us to use the Markov SDDP to solve optimization problems with time-dependent underlying processes (approximated by our technique).
+exact unconditional distribution, restricted to those regions. In
+result, the shape of the approximation resembles that of the original distribution with the first-stage approximation being equal to the original distribution. This approximating process remains dependent on the past only through a finite number of possible values, which allows us to use the Markov SDDP to solve optimization problems with time-dependent underlying processes (approximated by our technique).
 
 To measure the accuracy of our approximation, we use nested distance, denoted by 
 $\d$, which has been specifically designed for multi-stage stochastic programs (see
 \cite{pflug2012distance} or \cite{pflug2014multistage}). Under
-certain conditions mentioned in \cite{pflug2014multistage}), Theorem 6.1:
+certain conditions mentioned in \cite{pflug2014multistage}, Theorem 6.1:
 \begin{equation}
 |v(\xi)-v(\varsigma)|\leq K\d(\xi,\varsigma)\label{eq:tbd}
 \end{equation}
-where $\text{\ensuremath{\xi} and \ensuremath{\varsigma} }$are the
+holds true where $\text{\ensuremath{\xi} and \ensuremath{\varsigma}}$ stand for the
 exact process and its approximation, $K$ is a constant, and $\ensuremath{v(\bullet)}$
-is the corresponding value function. This could help us to keep the approximation error (the l.h.s. of (\ref{eq:tbd})) under control, but the abovementioned ``certain conditions'' are rarely
+is the corresponding value function. This could help us keep the approximation error (the l.h.s. of (\ref{eq:tbd})) under control, but the above-mentioned ``certain conditions'' are rarely
 fulfilled in practice. Even though we might expect for (\ref{eq:tbd}) to hold
-locally, we demonstrate in the sequel, 
-that the left hand side of (\ref{eq:tbd}) is infinite for some approximations $\varsigma$.
-Nevertheless, in our opinion, nested distance is still the most
-suitable metric for measurement of random parameters approximation in multi-stage stochastic programming.
+locally, we demonstrate later 
+that the left-hand side of (\ref{eq:tbd}) is infinite for some approximations $\varsigma$.
+Nevertheless, in our opinion, the nested distance is still the most
+suitable metric for measuring approximations of random parameters in multi-stage stochastic programming.
 
 
-As the computation of the nested distance for general $\varsigma$ is intractable and even determining the optimal skeleton (in some particular sense of optimality as described in \cite{lohndorf2019modeling}), leads to non-trivial non-convex optimization problems, we give up on finding the optimal approximation. Instead, we state an upper bound
+The computation of the nested distance for general $\varsigma$ is intractable and even determining the optimal skeleton (in a certain particular sense of optimality as described in \cite{lohndorf2019modeling}) leads to non-trivial non-convex optimization problems. Hence  we give up on finding the optimal approximation. Instead, we state an upper bound
 of the nested distance between the exact process and its smoothed
-quantization and we show that this distance converges in the one-dimensional
-case. Further, we discuss settings of the approximation's parameters so
+quantization and, in the one-dimensional
+case, we show that this distance converges. Further, we discuss settings of the approximation's parameters so
 that the distance is kept small, and propose a refinement of the
 approximation guaranteeing that the approximated problem is bounded. 
 Finally, we apply our
@@ -262,9 +262,9 @@ multi-stage problem (Section \ref{sec:Ihtroductiondef}) and the discussion
 of the nested distance (Section \ref{sec:Nested}), we introduce the
 smoothed quantization (Section \ref{sec:sq}) and we discuss the choice
 of its parameters and its refinement (Section \ref{sec:approx}).
-Further, the practical illustration is presented (Section \ref{sec:appl})
+The practical illustration is then presented (Section \ref{sec:appl})
 and the paper is concluded (Section \ref{sec:conc}). Auxiliary results
-are put into the Appendix.
+are provided in the Appendix.
 
 \section{\label{sec:Ihtroductiondef} Risk averse multi-stage problem.}
 
@@ -284,8 +284,8 @@ x_{t}
 Here, $b_{0}\in\R^{j_{0}},c_{0}\in\R^{d_{0}}$ are deterministic vectors,
 $A_{0}\in\R^{j_{0}\times d_{0}}$ is a deterministic matrix. Further,
 for each $0<t\leq T$, $b_{t}\in\R^{j_{t}}$ and $c_{t}\in\R^{d_{t}}$ are
-(possibly) random vectors and $A_{t}\in\R^{j_{t}\times (d_{t-1} + d_t)}$ is
-a (possibly) random matrix. Symbol $'$ denotes transposition. The dimensions, $d_{0},\dots,d_{T}$ and
+(possibly random) vectors and $A_{t}\in\R^{j_{t}\times (d_{t-1} + d_t)}$ is
+a (possibly random) matrix. Symbol $'$ denotes transposition. The dimensions, $d_{0},\dots,d_{T}$ and
 $j_{0},\dots,j_{T}$ are deterministic. Finally, $(\F_{t})_{t=0,\dots,T}$
 is the filtration generated by process $(A_{t},b_{t},c_{t})_{0\leq t\leq T}$,
 and $\rho$ is a nested risk measure defined as
@@ -293,12 +293,12 @@ and $\rho$ is a nested risk measure defined as
 \rho(z_{0},\dots,z_{T})=z_{0}+\sigma_{1}(z_{1}+\sigma_{2}(z_{2}\dots+\sigma_{T}(z_{T}))),\qquad z_{t}\in\F_{t},\quad0\leq t\leq T,
 \]
 where, for each $1\leq t\leq T$, $\sigma_{t}$ is a conditional risk
-mapping, i.e. a convex, monotone and translation invariant function
+mapping, i.e., a convex, monotone and translation invariant function
 from the space of integrable $\F_{t}$-measurable real functions into
 the space of integrable $\F_{t-1}$-measurable real functions (see
 \cite{ruszczynski2006conditional}, Definition 2.1). 
 
-One of the most frequent choices of $\sigma_{\bullet}$ is the
+One of the most frequent choices for $\sigma_{\bullet}$ is the
 mean-CVaR risk mapping, defined as 
 \[
 \sigma_{t}(z)=(1-\lambda)\E(z|\F_{t-1})+\lambda \cvar_{\alpha}(z|\F_{t-1}),\qquad1\leq t\leq T,
@@ -311,15 +311,15 @@ Without loss of generality,\footnote{Recall that non-Markov processes may be tra
 \begin{equation}
 A_{t}=\Xi_{t}(\xi_{t},\eta_{t}),\qquad b_{t}=\phi_{t}(\xi_{t},\eta_{t}),\qquad c_{t}=\psi_{t}(\xi_{t},\eta_{t}),\qquad0\leq t\leq T,\label{eq:exi}
 \end{equation}
-where $\xi$ is a Markov process taking values in $\R^{p}$ with
-$\xi_{0}$ deterministic, $\eta$ is a time-independent stochastic
-process taking values in $\R^{q}$ with $\eta_{0}$ deterministic,
+where $\xi$ is a Markov process taking values in $\R^{p}$ with deterministic 
+$\xi_{0}$ , $\eta$ is a time-independent stochastic
+process taking values in $\R^{q}$ with deterministic $\eta_{0}$ ,
 independent of $\xi$, and, for each $0\leq t\leq T$, $\Xi_{t}:\R^{p+q}\rightarrow\R^{j_{t}\times (d_{t-1}+d_{t}) },$
  $\phi_{t}:\R^{p+q}\rightarrow\R^{j_{t}}$ and $\psi_{t}:\R^{p+q}\rightarrow\R^{d_{t}}$
 are measurable mappings.
 
-As it was already mentioned, the computationally easiest situation is when the random parameter
-of the problem is time-independent, i.e. $\xi\equiv0$. Sometimes, a problem with a time-dependence may be reformulated to a problem dependent
+As it has already been mentioned, the computationally easiest situation occurs when the random parameter
+of the problem is time-independent, i.e., $\xi\equiv0$. A problem with a time dependence may sometimes be reformulated as a problem dependent
 only on an i.i.d. underlying process. If, for instance, 
 \begin{equation}
 b_{t}=B_{t}\xi_{t}+\delta_{t}(\eta_{t}),\qquad1\leq t\leq T,\label{eq:bbd}
@@ -331,8 +331,8 @@ $b_{t}$ may be made dependent only on an i.i.d. random process by
 adding a vector of artificial variables $y_{t}$ and constraints
 $b_{t}=B_{t}y_{t}+\delta_{t}(\eta_{t})$, $y_{t}=C+Dy_{t-1}+\epsilon_{t}$
 for each $1\leq t\leq T$. If, alternatively, $\xi_{t}=C\xi_{t-1}\epsilon_{t}$
-for some matrix $C$, then the second constraint would be $y_{t}=C\epsilon_{t}y_{t-1}$.
-Unfortunately, similar transformation cannot be done for $A_{t}$ or
+is true for a certain matrix $C$, then the second constraint would be $y_{t}=C\epsilon_{t}y_{t-1}$.
+Unfortunately, a similar transformation cannot be done for $A_{t}$ or
 for $c_{t}$, since for both of them this would bring multiplication
 of decision variables into the optimization problem, destroying its convex structure. That said, many cases of inter-stage dependence cannot be circumvented by reformulations.
 
@@ -348,12 +348,12 @@ function. The main reason for choosing $l_{1}$ is the fact that it can be expres
 Nested Distance is defined by means of conditional probabilities.
 Before proceeding, let us recall that, having two measurable spaces $(A,\A)$ and $(B,\B)$, the conditional distribution of
 a random element $\alpha\in A$ given a random element $\beta\in B$
-may be understood either as a collection of random variables $(\P[\alpha\in S|\sigma(B)],S \in \A)$, or as a random measure, i.e. a mapping $\mu(\bullet|\blacktriangle):\A\times B\rightarrow[0,1]$
+may be understood either as a collection of random variables $(\P[\alpha\in S|\sigma(B)],S \in \A)$, or as a random measure, i.e., a mapping $\mu(\bullet|\blacktriangle):\A\times B\rightarrow[0,1]$
 such that, for fixed $b\in B$, $\mu(\bullet|b)$ is a probability
 distribution and, for fixed $S\in\A$, $\mu(S|\blacktriangle)$ is
-measurable (see \cite{Kallenberg02} Chp 1.). In the present paper,
+measurable (see \cite{Kallenberg02} Chap. 1.). In the present paper,
 we understand conditional probabilities in the latter sense. Moreover, once
-$\mu(\bullet|\blacktriangle)$ is the (random measure version of a) conditional
+$\mu(\bullet|\blacktriangle)$ is the (random-measure version of a) conditional
 distribution of $\alpha$ given $\beta$, we put $\P[\alpha\in\bullet|\beta=\blacktriangle]\defined\mu(\bullet|\blacktriangle)$,
 $\P[\alpha\in\bullet|\beta]\defined\mu(\bullet|\beta)$ and, by writing
 $\mu(\blacktriangle)$, we mean the mapping from $B$ into the
@@ -361,15 +361,15 @@ space of probability distributions on $\A$ defined by $\mu$.
 
 Until the end of this Section, let $p\in\N \setminus \{0\}$ and let $\xi$ and $\varsigma$
 be processes defined on $\{0,\dots T\}$ taking values in $\R^{p}$
-with $\xi_{0}=\varsigma_{0}$ deterministic and with finite first
+with deterministic $\xi_{0}=\varsigma_{0}$  and with finite first
 moments. Further, 
 for any collection $(x_{0},\dots,x_{t})$ where $x_\tau \in \R^p$, $0\leq \tau \leq t$, put $\overline{x}_{t}\defined(x_{1},\dots,x_{t})$, and put $\bar{p}_{T}\defined Tp$.
 
 \begin{definition} Let $\B^{p}\defined\B(\R^{p})$ be the Borel
 sigma-field on $\R^{p}$.
 Let $P$ and $Q$ be probability distributions, both defined on $(\R^{p},\B^{p})$. A probability measure $\pi$ on $(\R^{p}\times\R^{p},\B^{p}\otimes\B^{p})$
-is called \emph{transportattion} from $P$ into $Q$ if $P$ and
-$Q$ are its marginal distributions. i.e.
+is called \emph{transportation} from $P$ into $Q$ if $P$ and
+$Q$ are its marginal distributions. i.e.,
 \begin{equation}
 \pi[A\times\R^{p}]=P(A)\label{eq:tpp}
 \end{equation}
@@ -381,16 +381,16 @@ for each $B\in\B^{p}$.
 \end{definition}
 
 \begin{definition}
-\label{dt} Let $\L(X)$ denote distribution of random element $X$. A probability measure $\pi$
+\label{dt} Let $\L(X)$ denote a distribution of random element $X$. A probability measure $\pi$
 on $(\R^{2\bar{p}_{T}},\B(\R^{2\bar{p}_{T}}))$ 
-is called \emph{nested transportation} from $\L(\xi)$ to $\L(\varsigma)$ (or, shortly, from $\xi$ to $\varsigma$)
+is called \emph{nested transportation} from $\L(\xi)$ to $\L(\varsigma)$ (or, briefly, from $\xi$ to $\varsigma$)
 if, for each $1\leq t\leq T$, $\pi(\xi_{t},\varsigma_{t}\in\bullet|\barxi_{t-1},\barvs_{t-1})$\footnote{Understanding $\pi$ as a distribution on $(\R^p)^{2T}$, $\pi(\xi_{t},\varsigma_{t}\in\bullet|\barxi_{t-1},\barvs_{t-1})$ denotes the conditional distribution of components $(t,T+t)$ given components $(1,\dots,t-1,T+1,T+t-1)$.}
  is a transportation from $\P[\xi_{t}\in\bullet|\barxi_{t-1}]$ into
 $\P[\varsigma_{t}\in\bullet|\barvs_{t-1}]$.
 \end{definition}
 
 \begin{definition}
-\label{def:d} The \emph{nested distance} of $\xi$ and $\varsigma$
+\label{def:d} The \emph{nested distance} between $\xi$ and $\varsigma$
 is defined as
 \begin{align*}
 \d(\xi,\varsigma)=\inf_{\pi} & \int_{\R^{2\bar{p}_{T}}}\|x-y\|\pi(dx,dy)\\
@@ -409,8 +409,8 @@ the Wasserstein distance).
 \begin{remark}
 \label{rem:cpp}Our definition of nested distance is equivalent to that from \cite{pflug2012distance}. In particular, our Definition \ref{dt} is equivalent to Definition 1 from \cite{pflug2012distance} with $\Omega=\Upsilon=\R^{\bar{p}_{T}}$, $\F_{t}=\G_{t}=\B^{\bar{p}_{t}}\otimes\{\emptyset,\R\}^{\bar{p}_{T}-\bar{p}_{t}}$ therein.\footnote{To be exact, the definitions are equivalent if the feasibility conditions
 in \cite{pflug2012distance} are understood in the sense that regular
-versions of the conditional probabilities exist, fulfilling the required
-conditions for each measurable set (see \cite{Kallenberg02}, Chp.
+versions of the conditional probabilities exist and fulfill the required
+conditions for each measurable set (see \cite{Kallenberg02}, Chap.
 6., for the discussion of the regularity of conditional probabilities).}
 \end{remark}
 
@@ -419,7 +419,7 @@ conditions for each measurable set (see \cite{Kallenberg02}, Chp.
 
 
 \noindent The following Proposition, similar to \cite{pflug2014multistage},
-Proposition 4.26, states an upper bound of the nested distance of
+Proposition 4.26, provides an upper bound of the nested distance between
 two Markov processes. Recall that the process $\xi$ is Markov if, for any $t=1,\dots,T$, the conditional distribution of $\xi_t$ given $\barxi_{t-1}$ depends only on $\xi_{t-1}$ (below, we call such conditional distributions Markov). 
 \begin{proposition}
 \label{prop:pp} Let $\xi$ and $\varsigma$ be Markov processes. Denote $\mu_{1},\dots,\mu_{T}$,
@@ -443,7 +443,7 @@ where $\prod_{i=t+1}^{t}(1+K_{i}) = 1$ by definition.
 
 \section{\label{sec:sq}Smoothed Quantization.}
 
-As is has been written in the Introduction, our motivation is to construct a continuous approximation of a time-dependent stochastic process which will depend on the past information only through a finite set of possible values. The present Section introduces a technique leading to such an approximation, which we call smoothed quantization,
+As stated in the Introduction, our motivation is to construct a continuous approximation for a time-dependent stochastic process which will depend on the past information only through a finite set of possible values. The present Section introduces a technique leading to such an approximation, which we call smoothed quantization,
 and discusses some of its properties. 
 \begin{definition}
 \label{def:cov}A collection $\mathcal{C}=(\{C_{1},\dots,C_{k}\},\{e_{1},\dots,e_{k}\})$
@@ -472,7 +472,7 @@ is called \emph{quantization of $\mu$ defined by $\C$} if
 \]
 \end{definition}
 
-\noindent Following Proposition discusses computation of the Wasserstein distance of  $\mu$ and $\theta$
+\noindent The following Proposition discusses computation of the Wasserstein distance between  $\mu$ and $\theta$
 when $\C$ is rectangular:
 \begin{proposition}
 \label{prop:thesis}Let $\zeta$ be a $p$-dimensional real random
@@ -492,11 +492,11 @@ the $i$-th component of $\zeta$, and $\epsilon^{i}(\bullet)=\sum_{j=1}^{k_{i}}e_
 See \cite{Smid09c}, Definition 4, Lemma 4 and its proof. 
 \end{proof}
 
-\noindent Coming to the topic of the Section, let $\xi$ be a Markov process
-on $\{0,\dots,T\}$ taking values in $\R^{p}$ with $\xi_{0}$ deterministic and with $\xi_1,\dots,\xi_T$ ruled by 
+\noindent Coming to the topic of the present Section, let $\xi$ be a Markov process
+on $\{0,\dots,T\}$ taking values in $\R^{p}$ with deterministic $\xi_{0}$ and with $\xi_1,\dots,\xi_T$ ruled by 
 the set of (Markov) probability distributions $\mu_{1},\dots,\mu_{T}$, respectively. Assume $\E\|\xi_{1}\|<\infty,\dots,\E\|\xi_{T}\|<\infty$. We approximate $\xi$ in two steps: first, we define a discrete ``skeleton'' process $\varepsilon$, and then we ``smooth'' the skeleton in order to get the final approximation $\varsigma$. 
 
-Speaking rigorously, we choose a suitable collection of rectangular coverings of $\R^{p}$ with representatives: 
+Strictly speaking, we choose a suitable collection of rectangular coverings of $\R^{p}$ with the following representatives: 
 \begin{multline*}
 \mathfrak{C}\defined(\C_{0},\C_{1},\dots,\C_{T}),\qquad\C_{0}=(\{\xi_{0}\},\{\R^{p}\}),\\
 \mathcal{C}_{t}=(\{C_{t,1},\dots,C_{t,k_{t}}\},\{e_{t,1},\dots,e_{t,k_{t}}\}),\quad1\leq t\leq T,
@@ -513,7 +513,7 @@ and, finally, for any $1\leq t\leq T$, we define (the conditional distributions 
 \P[\varsigma_{t}=\bullet|\barvs_{t-1},\overline{\varepsilon}_{t}]=\omega_{t,i_{t}(\varepsilon_{t})}(\bullet),\qquad i_{t}(\bullet)\defined\sum_{i=1}^{k_{t}}i\charf_{C_{t,i}}(\bullet),\label{eq:vsdef}
 \end{equation}
 where, 
-for each $1\leq t\leq T$ and any representative $e$ of $\C_{t-1},$
+for each $1\leq t\leq T$ and any representative $e$ of $\C_{t-1}$,
 $\theta_{t}(e)$ is the quantization of $\mu_{t}(e)$ defined by $\C_{t}$
 and 
 \[
@@ -527,10 +527,10 @@ We call $\varsigma$ \emph{smoothed quantization of $\xi$ defined
 by $\mathfrak{C}.$}
 \end{definition}
 
-\noindent Let us describe our technique informally. As $\varsigma_{0}=\xi_0=\epsilon_0$ are deterministic, $\tilde \mu=\mu(\epsilon_0)$, so the approximation of $\xi_1$ by $\varsigma_1$ is perfect. 
-The best approximation of the conditional distribution of $\xi_2$ given a past value $x$ of $\xi$ would certainly be $\mu_2(x)$; however, as we want to have only a few values the future can depend on, we use the ``second best'' choice to condition $\mu_2$: a representative $e$ of a region in which $x$ lies. So we quantize $\mu_2(e)$, and we consequently obtain (conditional) probabilities of $e_{2,1},\dots,e_{2,k_2}$. Now we could smooth the approximating distribution by means of $\mu_2(e)$ to get the exact approximation of the conditional distribution, yet with a different condition. Then, however, the smoothed distribution would depend both on $\epsilon_1$ (determining the shape of the distribution) and $\epsilon_2$ (determining the region we truncate it to), which would mean $k_1 \times k_2$ different distributions at $t=2$ hence $k_1 \times k_2$ sets of cuts in the SDDP algorithm (see below). By using the same smoothing distribution regardless of the condition (the truncated unconditional one), the number of possible distributions, hence of the cut sets, will be equal only to $k_2$ at $t=2$.
+\noindent Let us describe our technique informally. As $\varsigma_{0}=\xi_0=\epsilon_0$ are deterministic, $\tilde \mu=\mu(\epsilon_0)$ holds true, so the approximation of $\xi_1$ by $\varsigma_1$ is perfect. 
+The best approximation of the conditional distribution of $\xi_2$ given a past value $x$ of $\xi$ would certainly be $\mu_2(x)$; however, as we want to have only a few values the future can depend on, we use the ``second best'' choice to condition $\mu_2$: a representative $e$ of a region in which $x$ lies. So we quantize $\mu_2(e)$, and we consequently obtain (conditional) probabilities of $e_{2,1},\dots,e_{2,k_2}$. We could now smooth the approximating distribution by means of $\mu_2(e)$ to get the exact approximation of the conditional distribution, yet with a different condition. However, the smoothed distribution would then depend on both $\epsilon_1$ (determining the shape of the distribution) and $\epsilon_2$ (determining the region we truncate it to), which would mean $k_1 \times k_2$ different distributions at $t=2$ hence $k_1 \times k_2$ sets of cuts in the SDDP algorithm (see below). By using the same smoothing distribution regardless of the condition (the truncated unconditional one), the number of possible distributions, hence of the cut sets, will be equal only to $k_2$ at $t=2$.
 
-Next, we summarize some basic properties of smoothed quantizations, 
+Next, we summarize some basic properties of the smoothed quantization. 
 
 \begin{figure}
 \begin{center}
@@ -570,16 +570,16 @@ We have
 \stackrel{(i)}{=}\nu_{t}(\bullet|\varsigma_{t-1}).
 \end{multline*}
 (iii) follows from the definition of $\nu_t$ and from (i).\\
-(iv) follows by imposing. \\
+(iv) follows by substituting. \\
 (v) is clear from (ii). 
 \end{proof}
-\noindent Definitions (\ref{eq:skelet}) and (\ref{eq:vsdef}) give us instructions how to simulate the process $\varsigma$: at the $t$-th time step, a value of $\epsilon_t$  is drawn from $\theta(\bullet|\epsilon_{t-1})$ first and, consequently, $\varsigma_t$ is 
+\noindent Definitions (\ref{eq:skelet}) and (\ref{eq:vsdef}) give us instructions how to simulate the process $\varsigma$: at the $t$-th time step: a value of $\epsilon_t$  is drawn from $\theta(\bullet|\epsilon_{t-1})$ first and, consequently, $\varsigma_t$ is 
 drawn from $\omega_{t,i_t(\epsilon_t)}$. Alternatively, as the distribution of $\varsigma_t$ depends on the past only through $\epsilon_t$, we can generate the skeleton process first and smooth it afterwards. For better understanding, we graphically illustrate our construction 
-by an example with $T=2$, $k_1=2$, and $k_2=3$ in Figure \ref{fig:ilust1}. 
+using an example with $T=2$, $k_1=2$, and $k_2=3$ in Figure \ref{fig:ilust1}. 
 
 %\tbd{move up} 
-Before stating an upper bound of the approximation error, measured
-by $\d(\xi,\varsigma)$, assume, without loss of generality, that
+Before determining an upper bound of the approximation error, measured
+by $\d(\xi,\varsigma)$, we assume, without loss of generality, that
 \begin{equation}
 \xi_{t}=g_{t}(\xi_{t-1},U_{t}),\qquad1\leq t\leq T,\label{eq:xxu}
 \end{equation}
@@ -649,7 +649,7 @@ As, by Lemma \ref{lem:flemma} in Appendix and (\ref{eq:htl}),
 \d(\barxi_{t},\barvs_{t})\leq(1+K_{t})\d(\barxi_{t-1},\barvs_{t-1})+\E\mathrm{d}(\mu_{t}(\varsigma_{t-1}),\nu_{t}(\varsigma_{t-1})).
 \label{eq:dxixi}
 \end{equation}
-Using triangular inequality, Proposition \ref{prop:vs} (iii), and (\ref{eq:liplip}), we have
+Using the triangular inequality, Proposition \ref{prop:vs} (iii), and (\ref{eq:liplip}), we have
 \begin{multline*}
 \mathrm{d}(\mu_{t}(\varsigma_{t-1}),\nu_{t}(\varsigma_{t-1}))\leq\mathrm{d}(\mu_{t}(\varsigma_{t-1}),\mu_{t}(\varepsilon_{t-1}))+\mathrm{d}(\mu_{t}(\varepsilon_{t-1}),\nu_{t}(\varepsilon{}_{t-1}))
 \\
@@ -659,7 +659,7 @@ K_t \E \|\varsigma_{t-1}-\varepsilon_{t-1}\|+\mathrm{d}(\mu_{t}(\varepsilon_{t-1
 Combined with (\ref{eq:dxixi}) we get (\ref{eq:dfirst}). 
 
 Further, by induction, 
-using the facts that $\xi_{0}=\varepsilon_{0}$ and that $\d(\barxi_{1},\barvs_{1})=0$
+using the facts that $\xi_{0}=\varepsilon_{0}$ and $\d(\barxi_{1},\barvs_{1})=0$
 (by Proposition \ref{prop:vs} (iv)), we get
 \[
 \d(\barxi_{t},\barvs_{t})\leq\sum_{\tau=1}^{t-1}\kappa_{\tau}\E\|\varsigma_{\tau}-\varepsilon_{\tau}\|+\sum_{\tau=2}^{t}\lambda_{\tau}\E\dw(\mu_{\tau}(\varepsilon_{\text{\ensuremath{\tau}}-1}),\nu_{\tau}(\varepsilon_{\tau-1}))
@@ -696,10 +696,10 @@ E_{t}^{\C}(\bullet)\defined\sum_{i=2}^{k_{t}-1}\mu_{t}(C_{i}|\bullet)\int|x-e_{t
 \begin{equation}
 F_{t}^{\C}(\bullet)\defined\mu_{t}(C_{1}|\bullet),\qquad G_{t}^{\C}(\bullet)\defined\mu_{t}(C_{k}|\bullet),\label{eq:thirdlip}
 \end{equation}
-and assume that $D^{\C}$, $E^{\C}$, $F^{\C}$, and $G^{\C}$ are Lipschitz (the Lipschitz constants may depend on $\C$). Then there
+and assume that $D^{\C}$, $E^{\C}$, $F^{\C}$, and $G^{\C}$ are Lipschitz (their Lipschitz constants may depend on $\C$). Then there
 exists a sequence $\mathfrak{C}_{1},\mathfrak{C}_{2},\dots$ of collections
 of coverings such that $\d(\barxi_{T},\barvs_{,T}^{\boldsymbol{\mathfrak{C}_{i}}})\rightarrow0$,
-where, for any covering collection $\mathfrak{C},$ $\varsigma^{\mathfrak{C}}$
+where, for any covering collection $\mathfrak{C}$, $\varsigma^{\mathfrak{C}}$
 is the smoothed quantization of $\barxi_{T}$ defined by $\mathfrak{C}$.
 \end{theorem}
 
@@ -791,7 +791,7 @@ which may be proved analogously to (\ref{eq:dfirst}) of Theorem \ref{prop:est} a
 implies (\ref{eq:secondih}) by (\ref{eq:mutheta}) and Lemma
 \ref{lem:ddd} in Appendix.
 
-Therefore, both (\ref{eq:asympb}) and (\ref{eq:secondih}) are proved.
+Therefore, both (\ref{eq:asympb}) and (\ref{eq:secondih}) have been proved.
 
 Next we show that, for each $1\leq t\leq T$, there exist a series
 of covering collections $\mathfrak{C}_{1},\mathfrak{C}_{2},\dots$
@@ -801,7 +801,7 @@ such that
 \end{equation}
  Clearly, (\ref{eq:dxde}) with $t=T$ proves the Theorem. We shall proceed by induction while  for $t=0$, (\ref{eq:dxde}) holds trivially. 
 
-Let $t>0$ and assume (\ref{eq:dxde}) to hold for $t-1$, i.e. that there
+Let $t>0$ and assume (\ref{eq:dxde}) to hold for $t-1$, i.e., that there
 exists a sequence $\mathfrak{D}_{1},\mathfrak{D}_{2},\dots$ of covering
 collections such that (\ref{eq:dxde}) holds for $t-1$ and $\mathfrak{D_{\bullet}}$ instead of
 $t$ and $\mathfrak{C_{\bullet}}$. 
@@ -821,13 +821,13 @@ and note that $\delta_{n}^{\C}\rightarrow0$ by the induction hypothesis.
 For each $i,n\in\N$, let $j(i,n)$ be such that $\delta_{j(i,n)}^{\C_{i}}\leq\frac{1}{2n}$.
 
 Finally, for any $n$, put $\mathfrak{C}_{n}=(\mathfrak{D}_{j(i(n),n)},\C_{i(n)})$.
-By imposing into (\ref{eq:asympb}), we get 
+By substituting into (\ref{eq:asympb}), we get 
 \begin{equation}
 \d(\barxi_{t},\barvs_{t}^{\mathfrak{C}_{n}})\leq2\dw(\xi_{t},\epsilon_{i(n),t}(\xi_{t}))+\delta_{j(i(n),n)}^{\C_{i(n)}}\leq\frac{1}{n}.
 \label{eq:dbx}
 \end{equation}
 Similarly we get, using (\ref{eq:secondih}), that $\d(\barxi_{t},\bareps_{t}^{\mathfrak{C}_{n}})\leq\frac{1}{n}$,
-which together with (\ref{eq:dbx}) proves (\ref{eq:dxde}).
+which, together with (\ref{eq:dbx}), proves (\ref{eq:dxde}).
 \end{proof}
 \noindent The next Proposition states sufficient conditions for (\ref{eq:firstlip})-(\ref{eq:thirdlip}).
 \begin{proposition}
@@ -908,7 +908,7 @@ so
 +h(c_{k-1},y)\int_{c_{k-1}}^{e_{k}}(e_{k}-c_{k-1})\omega_{k}(dx)\\
 \leq h(c_{1},y)(c_{1}-e_{1})+\sum_{i=2}^{k-1}(h(c_{i},y)+h(c_{i-1},y))(c{}_{i}-c_{i-1})+h(c_{k-1},y)(e_{k}-c_{k-1})
 \end{multline*}
-which gives the Lipschitz property of  (\ref{eq:seclip}) by applying a similar trick as in the
+which implies the Lipschitz property of  (\ref{eq:seclip}) by applying a similar trick as in the
 case of $D$ to the middle term. 
 
 Finally, as $h$ is uniformly bounded, so is the derivative of $G$
@@ -916,7 +916,7 @@ and the Lipschitz property of (\ref{eq:thirdlip}) holds.
 \end{proof}
 
 \begin{example}
-Let $p=1$ and let $\xi_{t}$ be AR(1), i.e. $\xi_{t}=a\xi_{t-1}+\epsilon_{t}$,
+Let $p=1$ and let $\xi_{t}$ be AR(1), i.e., $\xi_{t}=a\xi_{t-1}+\epsilon_{t}$,
 $1\leq t\leq T,$ where the c.d.f. $F$ of $\text{\ensuremath{\epsilon_{t}}}$
 is differentiable with $F'=f$ unimodal. Then 
 \[
@@ -931,7 +931,7 @@ and similarly for the upper tail.} Thus, by Proposition \ref{lem:dif}, the Lipsc
 hold and, consequently, Theorem \ref{thm:conv} holds once the tails
 of each $\sum_{\tau=1}^{t}a^{t-\tau}\epsilon_{t}$, $1\leq t\leq T,$
 are \emph{$O(x^{-\alpha})$ }for some \emph{$\alpha>1$}, which is
-the true in most cases because the converse would imply infinite second
+true in most cases because the converse would imply infinite second
 moments. 
 \end{example}
 
@@ -939,9 +939,9 @@ moments.
 If $\xi_{t}=\xi_{t-1}\epsilon_{t}$ then $G_{t}(x|y)=\P[\epsilon_{t}\leq\frac{x}{y}]=F(\frac{x}{y})$
 where $F$ is the c.d.f. of $\epsilon_{t}$. Here, unfortunately,
 Proposition \ref{lem:dif} cannot be used because $\int\frac{\partial}{\partial y}G_{t}(x|y)dx=-\frac{1}{y^{2}}\int F'(\frac{x}{y})dx=-\frac{1}{y}$
-is unbounded. Certainly, we can assume $\xi_{t}$ to be a random walk
+is unbounded. We can, of course, assume $\xi_{t}$ to be a random walk
 and modify the mappings $\phi_{t},\psi_{t}$ and $\Xi_{t}$ in (\ref{eq:exi})
-(i.e. use $\phi_{t}(e^{x},u)$ instead of $\phi_{t}(x,u)$ etc.);
+(i.e., use $\phi_{t}(e^{x},u)$ instead of $\phi_{t}(x,u)$ etc.);
 however it is not guaranteed that the nested distance of the exponentials
 would converge, too. 
 \end{example}
@@ -949,14 +949,14 @@ would converge, too.
 \begin{remark}
 A version of Theorem \ref{thm:conv} for $p>1$ can be formulated
 for the price of more complex notation; however, a counterpart of (\ref{eq:seclip}) seems impossible to be verified even
-for the autoregression as the probabilities $q_{\bullet}$ are involved. 
+for the auto-regression as the probabilities $q_{\bullet}$ are involved. 
 \end{remark}
 
 \noindent Finally, we prove that the nested distance does not increase when
 we consider the i.i.d. part of the underlying process, which is not approximated.
 \begin{proposition}
 \label{prop:witheta}Let $\eta$ be a process taking values in $\R^{q}$
-with $\eta_{0}$ deterministic, such that $\xi\indep{\eta}$ and $\varsigma\indep{\eta}$, where $\indep$ means independence.
+with deterministic $\eta_{0}$, such that $\xi\indep{\eta}$ and $\varsigma\indep{\eta}$, where $\indep$ means independence.
 Then $\d((\xi,\eta),(\varsigma,\eta))\le\d(\xi,\varsigma)$.
 \end{proposition}
 
@@ -978,24 +978,24 @@ suitable and as exact as possible.
 The first thing to be taken into account is computability. Within the plain SDDP, $T-1$ collections of cuts, approximating
 the cost-to-go functions, are maintained, and each of these collections
 is updated during each backward pass, while, in our implementation of Markov SDDP, the number
-of the cut collections equals to $\kappa=\sum_{t=1}^{T}k_{t}=\sum_{t=1}^{T}\prod_{i=1}^{p}k_{t,i}$
+of the cut collections equals $\kappa=\sum_{t=1}^{T}k_{t}=\sum_{t=1}^{T}\prod_{i=1}^{p}k_{t,i}$
 (the total number of the skeleton processes atoms) and, during each
 backward pass, only one collection per stage is updated. Therefore,
 it could be expected that the time complexity of the solution will
 be roughly linear in $\kappa$. Taking into account that a solution of a single problem by the plain
 SDDP could take tens of minutes on a regular PC (with processor Intel Core 5 and 16 GB RAM), it is clear that the numbers $k_{t,i}$ cannot be
-high, especially given multi-dimensional $\xi_{t}$, and even
+large, especially given multi-dimensional $\xi_{t}$, and even
 in the one-dimensional it would be very time consuming to exploit the
 asymptotic properties we proved. In any case, the number of the atoms
 is limited by our computational resources.
 
 Having determined the numbers of the atoms we can computationally afford, the next step is to choose the
-frontiers of the covering sets and the representatives. As we have
-already premised, we find reasonable to choose these parameters so
+frontiers of the covering sets and their representatives. As we have
+already premised, we find it reasonable to choose these parameters so
 that $\d(\xi,\varsigma)$ (hence $\d((\xi,\eta),(\varsigma,\eta))$
 by Proposition \ref{prop:witheta}) is minimized. 
 Unfortunately, such minimization is a very complex task, even if we resort to the minimization of the upper bound (\ref{eq:dthird}).
-That said, finding optimal representatives with respect to (\ref{eq:dthird})
+That said, finding the optimal representatives with respect to (\ref{eq:dthird})
 with the frontiers known is a complex, possibly non-convex problem:
 the second part of (\ref{eq:dthird}) and the dependence between
 the stages being due. However, if we believe that the distributions
@@ -1009,19 +1009,19 @@ $$
 \sum_{k=1}^{k_{\tau,i}} \int|x-e_{\tau,i,k}| \left(\sum_{j:e^i_{\tau,j}=e_{\tau,i,k}} q_{\tau,i,k} \right)
 \omega^i_{\tau,k} (dx)
 $$
-where $e_{\tau,i,1},\dots e_{\tau,i,k_{\tau,i}}$ are the possible values of $e^i_{\tau,\bullet}$. It is well known, that (each summand on the) right hand side is minimized by $e_{t,i}^{i}=\mathrm{median}(\omega^i_{t,j})$.
+where $e_{\tau,i,1},\dots e_{\tau,i,k_{\tau,i}}$ are the possible values of $e^i_{\tau,\bullet}$. It is well known that (each term on the) right-hand side is minimized by $e_{t,i}^{i}=\mathrm{median}(\omega^i_{t,j})$.
 % https://groups.google.com/forum/#!topic/sci.math.stat/1HuyzpvMXbw
 
-Unfortunately, as we have premised, not all $\varsigma$'s with a reasonable nested distance
+Unfortunately, as we have premised, not all $\varsigma$'s with a reasonable value of the nested distance
 are suitable for the approximation of Problem (\ref{eq:p}). In particular,
 it may happen that, unlike the original problem, the approximate
-version is unbounded. To illustrate this, consider a (hypothetical)
+version is unbounded. To illustrate this possibility, consider a (hypothetical)
 asset-liability problem in which it is necessary to satisfy a random 
 liability, no greater than some constant $b$, at the time $T$ by means of buying an asset at the times
-$0,\dots,T-1$. Say that the decision criterion is a nested mean-CVaR and that, in-line with Efficient Market Hypothesis (see \cite{Cuthbertson97}), the asset prices are martingale (see \cite{Kallenberg02}, Chapter 7). Given these assumptions, there is no reason to buy more assets than $b$, because buying more than $b$ assets up to $T-1$ and selling them at $T$ would (possibly) increase
-risk (CVaR in our case) without increasing mean. However, as our approximation uses ``incorrect'' conditioning value, it can happen that, despite the true price process is a martingale, the approximated one is a sub-martingale, i.e. the prices increase on average (to see it, recall that $\E(\varsigma_{t+1}|\varsigma_t=\bullet)$
-is piece-wise constant by Proposition \ref{eq:dthird} (iii), so $\E(\varsigma_{t+1}|\varsigma_{t})\neq\varsigma_{t}$
-almost surely once $\omega$'s are absolutely continuous). If this (false) increase is high enough and/or the risk aversion is small enough, then, within the approximating problem, it could be ``reasonable'' to buy unlimited amounts of the asset to sell it at $T$. As a result, these (false) arbitrage opportunities can completely overshadow the asset-liability
+$0,\dots,T-1$. Say that the decision criterion is a nested mean-CVaR and that, in line with Efficient Market Hypothesis (see \cite{Cuthbertson97}), the asset prices form a martingale (see \cite{Kallenberg02}, Chapter 7). Given these assumptions, there is no reason to buy more assets than $b$, because buying more than $b$ assets up to $T-1$ and selling them at $T$ would (possibly) increase
+risk (CVaR in our case) without increasing the mean value. However, as our approximation uses an ``incorrect'' conditioning value, it can happen that, despite the true price process being a martingale, the approximated one is a sub-martingale, i.e., the prices increase on average (to see it, recall that $\E(\varsigma_{t+1}|\varsigma_t=\bullet)$
+is a piece-wise constant by Proposition \ref{eq:dthird} (iii), so $\E(\varsigma_{t+1}|\varsigma_{t})\neq\varsigma_{t}$
+almost surely once $\omega$'s are absolutely continuous). If this (false) increase is high enough and/or the risk aversion is small enough, then, within the approximating problem, it could be ``reasonable'' to buy unlimited amounts of the asset to sell it at $T$. In result, these (false) arbitrage opportunities can completely overshadow the asset-liability
 management since the profits from the ``speculation'' would be unlimited. Clearly, to avoid this problem, the approximation has to be modified.
 
 Proceeding generally, we start by giving a simple criterion, which,
@@ -1079,8 +1079,8 @@ it is computed, we have $\mathrm{CVaR}(z|\F) \geq \E(z|\F)$ and, consequently,  
 
 \noindent The way of finding an approximation $\varsigma$ such that the boundedness
 criterion is met clearly depends on the structure of the approximated problem.
-As we will see in the next Section, one of the conditions, guaranteeing
-the boundedness of the Problem (\ref{eq:p}) with $p=1$, could be
+As we will see in the next Section, one of the conditions guaranteeing
+the boundedness of the Problem (\ref{eq:p}) with $p=1$ could be
 
 \begin{equation}
 \varrho\E(\xi_{t}|\xi_{t-1})\leq\xi_{t-1},\qquad1\leq t\leq T,\label{eq:ref}
@@ -1233,9 +1233,9 @@ $, $1\leq j\leq k_{t}$, $1\leq t\leq T-1$, so $\mathrm{median}(\tilde{\omega}_{t
 In the present Section, we illustrate our approximation technique by
 a simplified version of a production-planning emission-trading problem
 of a steel company, published in \cite{zapletal2019multi}. The company produces
-4 products made out of 5 raw products, and buys necessary carbon allowances
+four products made out of five raw products, and buys necessary carbon allowances
 on a secondary market. The subject of their decision is the production
-and timing of allowances purchase. The decision problem is as follows:
+and the timing of the allowances purchase. The decision problem is as follows:
 \begin{align}
 \inf & \rho(-z_{0},\dots,-\varrho^{T}z_{T})\label{eq:etp}\\
 \text{s.t.} &\quad z_{0}\in\R,\quad z_{0}=-P_{0}s_{0},\nonumber \\
@@ -1247,16 +1247,16 @@ and timing of allowances purchase. The decision problem is as follows:
  &\quad s_{t}\in\R,\quad 0\leq t \leq T,\nonumber\\
  &\quad \text{Any variable indexed by $t$ is $\F_t$-measurable,}\qquad 0\leq t\leq T. \nonumber 
 \end{align}
-Here, $\rho$ is the nested mean-CVaR risk measure. Decision variables include: $z_t$ -- the monetary income of the company, $x_t$ -- the final production, $y_t$ -- the raw production, $u_t$ and $s_t$ -- the numbers of the allowances held, purchased, respectively.
+Here, $\rho$ is the nested mean-CVaR risk measure. The decision variables include: $z_t$ -- the monetary income of the company, $x_t$ -- the final production, $y_t$ -- the raw production, $u_t$ and $s_t$ -- the numbers of the allowances held and purchased, respectively.
 
-Constants include: $r \in \R^{5 \times 4}$ -- the production matrix, $w\in \R^5$ -- the raw production limits, $h \in \R^5$ -- the vector of unit emissions, $\varrho \in \R$ -- the discount factor.
+The constants include: $r \in \R^{5 \times 4}$ -- the production matrix, $w\in \R^5$ -- the raw production limits, $h \in \R^5$ -- the vector of unit emissions, $\varrho \in \R$ -- the discount factor.
 
 As for the random parameters,
 $$
 P_t \in \R,\qquad P_t = P_{t-1}\exp\left\{ -\frac{\upsilon^2}2 + \upsilon V_t \right\},
 \qquad 1\leq t \leq T,
 $$ 
-is the process of allowance prices, where $V_1,\dots,V_T$ are i.i.d. standard normal randovm variables and $\upsilon > 0$ is a parameter. Note that $P_t$ is in fact a discretized martingale Geometrical Brownian motion with volatility $\upsilon$.
+is the process of the allowance prices, where $V_1,\dots,V_T$ are i.i.d. standard normal random variables and $\upsilon > 0$ is a parameter. Note that $P_t$ is, in fact, a discretized martingale Geometrical Brownian motion with a volatility of $\upsilon$.
 
 Further,
 \[
@@ -1271,19 +1271,19 @@ D_{t}\in \R^4,\qquad D_{0}=d,\qquad D_{t}=0.5D_{t-1}+0.5(d\text{+\ensuremath{E_{
 \]
 is the process of demand with $d$ being a
 constant vector and $E_{t}$ is binomial symmetric with its atoms set so that the
-unconditional variance matrix equals to $\frac{1}{4^2}$ of the demand process from \cite{zapletal2019multi}, Section 3. For the values of the constants and for more details, see \cite{zapletal2019multi}. 
+unconditional variance matrix equals $\frac{1}{4^2}$ of the demand process from \cite{zapletal2019multi}, Section 3. For the values of the constants and for more details, see \cite{zapletal2019multi}. 
 
 In the present Section, we deal with the instance of Problem (\ref{eq:etp}) with  $T=2$, $\rho$ being the nested Mean-CVaR risk measure (with $\lambda=0.5$
 and $\alpha=0.2)$,  $\varrho=0.96$, 
 $\omega = 0.0325$, $\nu=0.439$ and $P_{0}=24.29$ EUR (the price
-in November 2019). All these values have been estimated from real-world data (see \cite{zapletal2019multi}).
+valid in November 2019). All these values have been estimated from real-world data (see \cite{zapletal2019multi}).
 
-The simplifications we made in comparison with the original problem from \cite{zapletal2019multi} in order to be more illustrative are as follows: our problem is one stage less, we do not allow derivatives, no allowances are granted for free here, and the distributions of the random parameters are rescaled (in order to accommodate the allowance prices increase in comparison with the time of \cite{zapletal2019multi}). Moreover, to be able to estimate the criterion better, we set the $\mathrm{CVaR}$ level to $0.2$ rather than $0.05$. 
+The simplifications we made in comparison with the original problem from \cite{zapletal2019multi} in order to be more illustrative are as follows: our problem is one stage less, we do not allow derivatives, no allowances are granted for free here, and the distributions of the random parameters are rescaled (in order to accommodate the allowance price increases in comparison with the time of \cite{zapletal2019multi}). Moreover, to be able to estimate the criterion better, we set the $\mathrm{CVaR}$ level to $0.2$ rather than $0.05$. 
 
-As the random parameter $D_{t}$ lies on the right hand size of the
+As the random parameter $D_{t}$ lies on the right-hand side of the
 constraints, it may be expressed by means of an artificial decision vector
 $d_{t}$. After doing this and some substitutions, the decision problem
-transforms to: 
+is transformed to: 
 \begin{align*}
 \inf & \rho(P_{0}u_{0},-\varrho z_{1},\dots,-\varrho^{T}z_{T})\\
 \text{s.t.} &\quad  z_{t}\in \R,\quad  z_{t}=M'_{t}x_{t-1}-P_{t}(u_t-u_{t-1}+h'rx_{t-1}),\quad  0<t\leq T,\\
@@ -1295,7 +1295,7 @@ transforms to:
  &\quad \text{Any variable indexed by $t$ is $\F_t$-measurable,}\qquad 0\leq t\leq T. \nonumber 
 \end{align*}
 In the language of Section \ref{sec:Ihtroductiondef}, we have $\eta_{t}=(M_{t},E_{t})$
-and $\xi_{t}=P_{t}$, $0\leq t\leq T$ with $M_{0}\equiv0,$$E_{0}\equiv0$. Note that $u_T=0$ meaning that no allowances are kept for ruture use at the time horizon.
+and $\xi_{t}=P_{t}$, $0\leq t\leq T$ with $M_{0}\equiv0,$$E_{0}\equiv0$. Note that $u_T=0$, i.e.,  no allowances are kept for future use at the time horizon.
 
 The following Proposition shows that (\ref{eq:ref}) is a sufficient
 condition for the boundedness of the Problem.
@@ -1349,10 +1349,10 @@ Brownian prices $P_t$, but also for any $P$ general Markov with finite first
 moments.
 \end{remark}
 
-\noindent To investigate the impact of the accuracy of the approximation to
+\noindent To investigate the impact of the accuracy of the approximation on
 the quality of the solution, we solved Problem (\ref{eq:etp}) for 22 different combinations of 
 $k_{1}$ and $k_{2}$. For each pair, we proceeded
-by Algorithms 1 and 2. In particular, we have put $c_{1,1}=$0.5, $e_{1,1}=0.45,$
+using Algorithms 1 and 2. In particular, we put $c_{1,1}=$0.5, $e_{1,1}=0.45,$
 $c_{2,1}=0.3$, $e_{2,1}=0.27$ (note that $\P[\xi_{t}\leq c_{t,1}],t=1,2,$
 are negligible); the rest of the frontiers we set, according to \cite{Smid09c}, to
 \[
@@ -1376,9 +1376,9 @@ Next, we solved the problem with $\chi$ instead of $\xi$ by the Markov SDDP
 algorithm, implemented in ${\tt C++}$ with ${\tt CPlex}$ serving as the
 linear programming solver. 
 
-To evaluate the resulting optimal policy, we tested it given the true (Geometrical
-Brownian) distribution of $P$; in particular, we estimated $\rho$ given the ``true'' distribution  using the policy steming from the approximation. We proceeded by simulation; namely, we 
-computed 20 estimators of $\rho$, each by means of $10,000$ scenarios $S\defined(P_{1},\eta_{1},P_{2},\eta_{2})$ drawn from the ``true'' distribution. To be able to estimate the inner $\CVaR$'s, we drew the sample using conditional sampling, i.e. $100$ observations were drawn from $\L(P_1)\circ\L(\eta_1)$ and, for each value $(p,\eta)$ obtained this way, $100$ observations were drawn from $\L(P_2|P_1=p)\otimes\L(\eta_2)$. For each scenario $S$, we computed the corresponding ``Markov'' scenario $M\defined (\epsilon_{1}(P_{1}),P_{1},\eta_{1},\epsilon_{2}(P_{2}),P_{2},\eta_{2})$,\footnote{Note that this could be done thanks to Proposition \ref{prop:vs} (i), and that it might not be possible for a general hidden Markov approximation.} and imposed it into the approximate policy to get the corresponding incomes $Z=(Z_1,Z_2)\defined (\varrho z_1, \varrho^2 z_2)$. As a result of this procedure, we had a sample of $100$ values of $Z_1$ and $100$ values of $Z_2$ for each $Z_1$. The mean part of the criterion was estimated by the sample means of $Z$, each $\CVaR(Z_2|Z_1=z)$ as a mean of the $20$ highest values of $Z_2$ with $Z_1=z$, and the outer $\CVaR$ as the average of the highest $20$ inner CVaRs. Finally, we estimated $\rho$ by the average of our 20 estimators, denoting it by $\tilde v(=\tilde v_{k_1,k_2})$.
+To evaluate the resulting optimal policy, we have tested it given the true (Geometrical
+Brownian) distribution of $P$; in particular, we have estimated $\rho$ given the ``true'' distribution  using the policy stemming from the approximation. We have proceeded by simulation; namely, we 
+have computed 20 estimators of $\rho$, each by means of $10,000$ scenarios $S\defined(P_{1},\eta_{1},P_{2},\eta_{2})$ drawn from the ``true'' distribution. To be able to estimate the inner $\CVaR$'s, we have drawn the sample using conditional sampling, i.e., $100$ observations are drawn from $\L(P_1)\circ\L(\eta_1)$ and, for each value $(p,\eta)$ obtained this way, $100$ observations are drawn from $\L(P_2|P_1=p)\otimes\L(\eta_2)$. For each scenario $S$, we compute the corresponding ``Markov'' scenario $M\defined (\epsilon_{1}(P_{1}),P_{1},\eta_{1},\epsilon_{2}(P_{2}),P_{2},\eta_{2})$,\footnote{Note that this can be done thanks to Proposition \ref{prop:vs} (i), and that it might not be possible for a general hidden Markov approximation.} and subsitute it into the approximate policy to get the corresponding incomes $Z=(Z_1,Z_2)\defined (\varrho z_1, \varrho^2 z_2)$. As a result of this procedure, we have a sample of $100$ values of $Z_1$ and $100$ values of $Z_2$ for each $Z_1$. The mean part of the criterion has been estimated by the sample means of $Z$, each $\CVaR(Z_2|Z_1=z)$ as a mean of the $20$ highest values of $Z_2$ with $Z_1=z$, and the outer $\CVaR$ as the average of the highest $20$ inner CVaRs. Finally, we estimate $\rho$ by the average of our 20 estimators, denoting it by $\tilde v(=\tilde v_{k_1,k_2})$.
 
 The results of solutions for individual pairs $k_1,k_2$ are summarized in Table
 \ref{tab:res} and depicted in Figure \ref{fig:mcvs}. Though
@@ -1387,10 +1387,10 @@ at the first look. By linear regression
 \[
 \tilde{v}_{k_1,k_2}\sim a+b\kappa,\qquad \kappa=k_{1}+k_{2}
 \]
-we got $b=0.019(0.002)$, where there is the standard error in brackets, which means that, by adding one node to the
+we get $b=0.019(0.002)$, where there is the standard error in brackets, which means that, by adding one node to the
 optimization, the value of the criterion increases by roughly EUR 19,000.
 Figure \ref{fig:times} shows the dependence of the computational
-times on $\kappa$; even though the trend come out quadratic, it is
+times on $\kappa$; even though the trend comes out quadratic, it is
 close to the linear one as we supposed.
 \begin{table}
 \begin{center}
@@ -1416,7 +1416,7 @@ $k_1$ & $k_2$ & $\tilde v_{k_1,k_2}$ & $t$ & $k_1$ & $k_2$ & $\tilde v_{k_1,k_2}
 \caption{Evaluation of optimal policies given various $k_1$, $k_2$. $\tilde v_{k_{1},k_{2}}$: average value of $-\rho$ (in
 millions of EUR) with standard deviation (within the $20$ estimates),
 $t$: average solution time in minutes (over the $20$ estimates), ``no opt'': objective value without
-optimization of emission trading (allowances not bought in forward).
+optimization of emission trading (allowances are not pre-purchased).
 }
 \label{tab:res}
 \end{center}
@@ -1438,9 +1438,6 @@ optimization of emission trading (allowances not bought in forward).
 \includegraphics{times}\caption{Computational times in dependence on $\kappa$. Vertical axis: time in seconds. }
 \label{fig:times}
 
-{\tt TBD(Cherri, Antonin, please leave this mark here, we delete it later. Anyway, for consistency with Table 1, I would convert it into minutes. Moreover, always for
-sake of consistency and readability, I would format the horizontal axis exactly as done for
-Figure 2 and Figure 3.)}
 \end{center}
 \end{figure}
 
@@ -1448,8 +1445,7 @@ Clearly, once the true optimal value $v$ is finite, the trend of the criterion i
 cannot be linear in $\kappa$ as the series should converge
 to $v$ from below. Unfortunately, the noise of the estimation
 prevented us from fitting more complex trends. However, when we rerun
-the same analysis with all the processes except for $P$
-deterministic, the noisedness of the criterion estimation decreased enough for the non-linear regression
+the same analysis with all the processes except for deterministic $P$, the noisiness of the criterion estimation decreased enough for the non-linear regression
 \[
 v-\tilde{v}_{k_1,k_2}\sim a\exp\{b\kappa\}
 \]
@@ -1460,7 +1456,7 @@ $v-\tilde{v}=O(\kappa^{b})$ came out insignificant).
 \begin{figure}
 \begin{center}
 \includegraphics{mcvs0}
-\caption{Evaluation of optimal policy with $\eta$ deterministic.}
+\caption{Evaluation of optimal policy with deterministic $\eta$.}
 \label{fig:mcvs0}
 \end{center}
 \end{figure}
@@ -1468,16 +1464,16 @@ $v-\tilde{v}=O(\kappa^{b})$ came out insignificant).
 
 Finally, as an experiment, we run several optimizations with discrete
 approximations and tried to evaluate them the same way as the smoothed
-quantization. In particular, we used the skeleton process $\varepsilon$
+quantization. In particular, we have used the skeleton process $\varepsilon$
 calibrated to be a martingale as an approximation instead of $\varsigma$.
-The resulting optimal policies, however, showed to be useless because they recommended
+The resulting optimal policies, however, have proved to be useless because they recommended
 arbitrage as a reaction to a significant portion of scenarios; needless
-to say that these recommendations led mostly to huge losses ``in reality'', as the true
+to say, such recommendations mostly lead to huge losses ``in reality'', as the true
 discounted price process is a supermartingale. This clearly speaks
-in favour of the smoothed quantization. However, it should be said in
-defence of discrete approximations that, when the decision period
+in favor of the smoothed quantization. However, it should be said in
+defense of discrete approximations that, when the decision period
 is long, a new optimization could (and should) be done at each stage
-rather then using the policy from the previous optimization; this
+rather than using the policy from the previous optimization; this
 new optimization can clearly be calibrated not to produce arbitrage in its first stage. If, on the other hand, the decision period is
 short, as in high-frequency trading for instance, then
 having a policy not producing arbitrage at hand is more than necessary.
@@ -1485,17 +1481,17 @@ having a policy not producing arbitrage at hand is more than necessary.
 \section{Conclusions} 
 \label{sec:conc}
 
-We proposed an approximation technique suitable for multi-stage problems with Markov random parameters and we illustrated its usefulness on a realistic problem. Our technique is suitable especially for financial applications as it does not neglect the distribution tails and it can cope with arbitrage potentially arising in approximated problems. 
+We have proposed an approximation technique suitable for multi-stage problems with Markov random parameters and illustrated its usefulness on a realistic problem. Our technique is especially suitable  for financial applications as it does not neglect the distribution tails and it can cope with arbitrage potentially arising in approximated problems. 
 
-In the present paper, the approximation is designed to minimize nested distance; however, its  parameters may be set to meet another criteria, e.g. to keep the first two moments of the exact process (the moments of $\varsigma$ may be easily evaluated by the Law of Iterated Expectation and the Law of Iterated Variance). Inspired by \cite{kozmik2014evaluating}, one may also think of finer approximation of the tails in order to fit tail measures more accurately. 
+In the present paper, the approximation is designed to minimize the nested distance; however, its  parameters may be set to meet other criteria, e.g., to keep the first two moments of the exact process (the moments of $\varsigma$ may be easily evaluated by the Law of Iterated Expectation and the Law of Iterated Variance). Inspired by \cite{kozmik2014evaluating}, one may also think of finer approximation of the tails in order to fit tail measures more accurately. 
 
-Thinking of future research, three ideas come to our minds. First, looking at Figure \ref{fig:ilust1}, it suggests itself to set $\P[\varepsilon_{t}=\bullet|\varepsilon_{t-1}=e]$ so that $\d(\nu_{t}(e),\mu_t(e))$ is minimized rather than determine the probabilities by (\ref{eq:skelet}). It should be, however, noted that such minimization could be difficult and, moreover, some of our theoretical results would stop holding. Second, our ``anti-arbitrage protection'' could be built into the initial construction of $\varsigma$. We did not do this in the present paper as the ``anti-arbitrage'' condition is problem-dependent; however, maybe it is possible to find more general conditions precluding arbitrage and build them into the initial construction of the approximation. Third, condition 
+Regarding future research, three ideas come to mind. First, looking at Figure \ref{fig:ilust1}, it suggests itself to set $\P[\varepsilon_{t}=\bullet|\varepsilon_{t-1}=e]$ so that $\d(\nu_{t}(e),\mu_t(e))$ is minimized rather than determine the probabilities by (\ref{eq:skelet}). It should, however, be noted that such minimization could be difficult and, moreover, some of our theoretical results may no longer hold. Second, our ``anti-arbitrage protection'' could be built into the initial construction of $\varsigma$. We did not do this in the present paper as the ``anti-arbitrage'' condition is problem-dependent; however, maybe it is possible to find more general conditions precluding arbitrage and build them into the initial construction of the approximation. Third, condition 
 \begin{equation}\label{eq:altaa}
 P_t \geq \varrho \sigma_{t+1}(P_{t+1})
 \end{equation}
- would probably suffice for boundendess of problem (\ref{eq:etp}) (as well as of similar ones); as this condition is less strict than (\ref{eq:eb}), it would lead to smaller distortions of the original approximations. However, to provin this e.g. for Problem \ref{eq:ppp} would require dealing with estimation of $\sigma_t(cM_t+dP_t)$ from below for some constants $c,d$, which would require either uniform boundedness of $M_t$, which is not the case in our example, or a general estimate of risk mappings of independent sums from below which we, however, are not aware of. But nothing prevents anyone to use approximations restricted only by (\ref{eq:altaa}) given that they do not produce arbitrage in practice.
+ would probably suffice for boundedness of problem (\ref{eq:etp}) (as well as of similar ones); as this condition is less strict than (\ref{eq:eb}), it would lead to smaller distortions of the original approximations. However, proving this, e.g., for Problem \ref{eq:ppp} would require dealing with estimation of $\sigma_t(cM_t+dP_t)$ from below for some constants $c,d$, which would require either uniform boundedness of $M_t$, which is not the case in our example, or a general estimate of risk mappings of independent sums from below which we, however, are not aware of. But nothing prevents anyone from using approximations restricted only by (\ref{eq:altaa}) given that they do not produce arbitrage in practice.
  
-Clearly, our technique may be improved many ways; however, even in the present form, it may be useful for a wide area of problems, including portfolio selection, derivative replication or asset-liability management. 
+Clearly, our technique might be improved in many ways; however, even in the present form, it may be useful for a wide area of problems, including portfolio selection, derivative replication or asset-liability management. 
 
 
 \section*{Acknowledgments}
@@ -1521,7 +1517,7 @@ All the data used in the paper are either published in the text or freely availa
 
 \appendix
 
-\section{Auxiliarry Results}
+\section{Auxiliary Results}
  
  
 \begin{lemma}
@@ -1530,18 +1526,18 @@ Denote $P=\L$($\barxi_{t}$), $Q=\L(\barvs_{t})$.
 Let $\pi$ be a nested transportation from $P$ into $Q$. Then, for
 each $x,s\in\R^{\bar{p}_{t-1}}$, an optimal transportation $\varpi_{t}(\bullet|x,s)$
 from $P[\xi_{t}\in\bullet|\barxi_{t-1}=x]$ into $Q[\varsigma_{t}\in\bullet|\barvs_{t-1}=s]$
-(w.r.t. $\dw$) exists and, moreover $\varpi_{t}$ is a probability
-kernel.
+(w.r.t. $\dw$) exists 
+(being a well defined conditional probability).
 \end{lemma}
 
 \begin{proof}
 By \cite{villani2003topics}, Theorem 1.3. $\varpi_{t}(\bullet|x,s)$
 exists (and is a probability measure) for each $x,s$. To prove that
-$\varpi_{t}$ is a probability kernel, it remains to show that
+$\varpi_{t}$ is a conditional probability, it remains to show that
 \begin{equation}
 \text{\ensuremath{\varpi_{t}(A|\bullet)} is measurable for each \ensuremath{A\in\B^{p}\otimes\B^{p}.}}\label{eq:vpm}
 \end{equation}
-Certainly, (\ref{eq:vpm}) holds if $A\in\C,$ $\C=\{B\times C:B,C\in\B^{p},\text{ at least one of $B$ and $C$ is $\R^p$}\}$
+Certainly, (\ref{eq:vpm}) holds if $$A\in\C, \qquad \C=\{B\times C:B,C\in\B^{p},\text{ at least one of $B$ and $C$ is $\R^p$}\}$$
 (because $\varpi_{t}(A|\bullet)=\P[B|\xi_{t-1}=\bullet_{1}]$ which
 is measurable by definition, similarly for the second coordinate).
 Clearly, $\C$ is a $\pi$ system with $\sigma(\C)=\B^{p}\otimes\B^{p}$.
@@ -1554,12 +1550,12 @@ for $A_{1}\subset A_{2}\subset\dots$, $A_{i}\in\mathcal{D}$, $i\in \N$, we have 
 by \cite{Kallenberg02}, Lemmas 1.14 and 1.10 (ii). Thus, $\mathcal{D}$
 is a $\lambda$-system containing $\C$, and, by the Monotone Class
 Argument (\cite{Kallenberg02}, Theorem 1.1), $\B^{p}\times\B^{p}\in\mathcal{D}$,
-i.e. (\ref{eq:vpm}) holds true.
+i.e., (\ref{eq:vpm}) holds true.
 \end{proof}
  
  
 \begin{lemma}
-\label{lem:flemma}Let $\mu$ be a conditional distribution on $(\R^{p},\B^{p})$ given values from from a measurable
+\label{lem:flemma}Let $\mu$ be a conditional distribution on $(\R^{p},\B^{p})$ given values from a measurable
 space $(S,\mathcal{S})$. Let $U\in\R^{s}$
 be a random vector and let $g:S\times R^{s}\rightarrow\R^{p}$ be
 a measurable mapping such that 
@@ -1608,10 +1604,9 @@ Lemma 2.37.
 \end{proof}
  
 \begin{lemma}
-\label{lem:indep}Let  $q\in \N$ and let $\eta,\eta'$ be processes on ${0,\dots,T}$ with $\eta_{t},\eta'_{t}\in$$\R^{q}$, $0\leq t\leq T$, 
+\label{lem:indep}Let $\xi$ and $\varsigma$ be processes in $\R^p$ on $\{0,\dots,T\}$ with deterministic $\xi_0$ and $\varsigma_0$ . Let  $q\in \N$ and let $\eta,\eta'$ be processes on ${0,\dots,T}$ with $\eta_{t},\eta'_{t}\in$$\R^{q}$, $0\leq t\leq T$, 
 having the same distribution, 
-with $\eta_{0}=\eta'_{0}$
-deterministic, such that $\eta\indep{\xi}$, \textup{$\eta'\indep{\varsigma}$.
+with deterministic $\eta_{0}=\eta'_{0}$, such that $\eta\indep{\xi}$, \textup{$\eta'\indep{\varsigma}$.
 }Then $\d((\xi,\eta),(\varsigma,\eta'))\leq\d(\xi,\varsigma)$.
 \end{lemma}
 
@@ -1623,17 +1618,18 @@ $\varsigma_t|\barvs_{t-1}$ (its existence is assured by the definition of the ne
 Further, for each $t$ and $\baru,\overline{v}\in\R^{\bar{q}_{t-1}},$$\bar{q}_{t-1}=(t-1)q$,
 let $\sigma_{t}(\bullet|\baru,\overline{v})$ the optimal transportation
 from $\L(\eta_{t}|\overline{\eta}_{t-1}=\baru)$ into $\L(\eta_{t}|\overline{\eta}_{t-1}=\overline{v})$.
-By Lemma \ref{lem:cw}, $\sigma_{t}$ is well defined probability
-kernel. As $\dw$ is a metric, we have $0=\dw(\eta_{t}|\baru,\eta'_{t}|\baru)=\int\|u-v\|\sigma{}_{t}(du,dv|\baru,\baru)$, so we can choose $\sigma_{t}$ so that $\sigma_{t}(\bullet|\baru,\baru)$
+By Lemma \ref{lem:cw}, $\sigma_{t}$ is a well-defined conditional probability. As $\dw$ is a metric, we have $0=\dw(\eta_{t}|\baru,\eta'_{t}|\baru)=\int\|u-v\|\sigma{}_{t}(du,dv|\baru,\baru)$, so we can choose $\sigma_{t}$ so that $\sigma_{t}(\bullet|\baru,\baru)$
 is concentrated on $\{(u,u):u\in\R^{q}\}$.
 
-For any $1\leq t\leq T$, denote $\theta=(\xi,\eta),$$\theta'=(\varsigma,\eta')$
-and consider a conditional distribution $\pi_t$ fulfilling
-\[
-\pi_{t}(\xi_{t}\in A,\eta_{t}\in B,\varsigma_{t}\in C,\eta'_{t}\in D|\overline{\theta}_{t-1},\overline{\theta'}_{t-1})=\sigma_{t}(B\times D|\overline{\eta}_{t-1},\overline{\eta'}_{t-1})\otimes\rho_{t}(A\times C|\barxi_{t-1},\barvs_{t-1}).
-\]
+For any $1\leq t\leq T$, denote $\theta=(\xi,\eta),$ $\theta'=(\varsigma,\eta')$
+and consider the conditional distribution $\pi_t$ defined as
+\begin{multline*}
+\pi_{t}(\xi_{t}\in A,\eta_{t}\in B,\varsigma_{t}\in C,\eta'_{t}\in D|\overline{\theta}_{t-1},\overline{\theta'}_{t-1})
+\\
+=\sigma_{t}(B\times D|\overline{\eta}_{t-1},\overline{\eta'}_{t-1})\otimes\rho_{t}(A\times C|\barxi_{t-1},\barvs_{t-1}).
+\end{multline*}
 It could be easily proved by the Monotone Class Argument (see the
-proof of Remark \ref{rem:cpp}) in Appendix that $\pi_{t}$ is a transportation
+proof of Remark \ref{rem:cpp} in Appendix \ref{app:cpp}) that $\pi_{t}$ is a transportation
 from $\theta_{t}|\overline{\theta}_{t-1}$ into $\theta'_{t}|\overline{\theta'}_{t-1}$.
 Consequently, the distribution $\pi$ defined by the composition of
 $\pi_{1},\dots,\pi_{T}$ is a nested transportation, so we have
@@ -1697,7 +1693,7 @@ Let $\pi_{t-1}$ be an $\epsilon$-optimal (w.r.t. $\d(\barxi_{t-1},\barvs_{t-1})$
 nested transportation from $\barxi_{t-1}$ to $\barvs_{t-1}$. Let,
 for each $x,s\in\R^{p}$, $\varpi_{t}(\bullet|x,s)$ be the optimal
 transportation from $\mu(x)$ into $\nu(s)$; by Lemma \ref{lem:cw} (Appendix),
-$\varpi_{t}$ is a well defined probability distribution.
+$\varpi_{t}$ is a well-defined probability distribution.
 
 Put
 \[
@@ -1719,12 +1715,12 @@ where
 B_{t}=\int\left(\int\|x{}_{t}-s_{t}\|\varpi_{t}(dx_{t},ds_{t}|x_{t-1},s_{t-1})\right)\pi_{t-1}(d\barx_{t-1},d\bars_{t-1})\\
 =\mathrm{\int d}(\mu_{t}(x_{t-1}),\nu_{t}(s_{t-1}))\pi_{t-1}(d\barx_{t-1},d\bars_{t-1})\\
 \leq\int\mathrm{d}(\mu_{t}(x_{t-1}),\mu_{t}(s_{t-1}))\pi_{t-1}(d\barx_{t-1},d\bars_{t-1})\\
-\qquad\qquad+\int\mathrm{d}(\mu(s_{t-1}),\nu_{t}(s_{t-1}))\pi_{t-1}(d\barx_{t-1},d\bars_{t-1})\\
+\qquad\qquad+\int\mathrm{d}(\mu_t(s_{t-1}),\nu_{t}(s_{t-1}))\pi_{t-1}(d\barx_{t-1},d\bars_{t-1})\\
 \leq K_{t}\int\|x_{t-1}-s_{t-1}\|\pi_{t-1}(d\barx_{t-1},d\bars_{t-1})+\E d(\mu_{\tau}(\varsigma_{\text{\ensuremath{\tau}}-1}),\nu_{\tau}(\boldsymbol{\varsigma}_{\tau-1}))\\
 \leq K_{t}(\mathrm{\d}(\barxi_{t-1},\barvs_{t-1})+\epsilon)+\E d(\mu_{\tau}(\varsigma_{\text{\ensuremath{\tau}}-1}),\nu_{\tau}(\boldsymbol{\varsigma}_{\tau-1}))
 \end{multline*}
 (we have used the triangular inequality for $\dw$). The Proposition
-now follows by imposing this into (\ref{eq:dxs}) and by a limit transition. 
+now follows by substituting this into (\ref{eq:dxs}) and by a limit transition. 
 
 
 \end{document}
